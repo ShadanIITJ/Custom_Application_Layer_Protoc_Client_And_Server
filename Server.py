@@ -15,40 +15,62 @@ def client_data_parser(data):
   content_type = data[-2][-4:]
   f_data = data[-1]
   dic ={}
-  temp = f_data.split("&")
-  for k in temp:
-    kv = k.split("=")
-    dic[kv[0].lower()]=kv[1]
-  
-  print(method)
-  print(content_type)
-  print(dic)
-  ######### use data base to return data ##########
+  if(content_type=="json"):
+    temp = f_data.split("&")
+    for k in temp:
+      kv = k.split("=")
+      dic[kv[0].lower()]=kv[1]
+  else:
+    pass
+  #print(method)
+  #print(content_type)
+  #print(dic)
+  ######### use database to return data ##########
 
   if(method.lower()=='pull'):
-    aa = get_by_email(db,dic["email"])
-    r_data = f"name={aa[1]}&email={aa[0]}&phone={aa[4]}&profession={aa[3]}&address={aa[2]}"
-    return(r_data,"OK","json")
+    try:
+      aa = get_by_email(db,dic["email"])
+      if(aa == None):
+        return("No Data Available For This Email","OK","text")
+      r_data = f"name={aa[1]}&email={aa[0]}&phone={aa[4]}&profession={aa[3]}&address={aa[2]}"
+      return(r_data,"OK","json")
+    except:
+      return("Insufficient data for performing PULL, Provide email","OK","text")
   
   elif(method.lower()=='insert'):
     # data = [email,name,address,profession,phoen]
-    l = [dic['email'],dic['name'],dic['address'],dic['profession'],dic['phone']]
-    aa = insert(db,l)
-    return(aa,"OK","text")
+    try:
+      l = [dic['email'],dic['name'],dic['address'],dic['profession'],dic['phone']]
+      aa = insert(db,l)
+      return(aa,"OK","text")
+    except:
+      return("Insufficient data, Require Following to execute ,[email, name, address, profession, phone]","OK","text")
   
   elif(method.lower()=='update'):
     # data = [name,address,profession,phoen]
-    l = [dic['name'],dic['address'],dic['profession'],dic['phone']]
-    email = dic["email"]
-    aa = update(db,email,l)
-    return(aa,"OK","text")
+    try:
+      l = [dic['name'],dic['address'],dic['profession'],dic['phone']]
+      email = dic["email"]
+      aa = update(db,email,l)
+      if(aa==None):
+        message = f'No such entry exist for {email} user insert method to create the table'
+        return(message,"OK","text")
+      return(aa,"OK","text")
+    except:
+      return("Insufficient data, Require Following to execute \n[email, name, address, profession, phone] \n Note Email is The primary key","OK","text")
+
+  elif(method.lower()=='delete'):
+    # data = email
+    try:
+      email = dic["email"]
+      aa = delete(db,email,True)
+      return(aa,"OK","text")
+    except:
+      return("Insufficient data, Require Email","OK","text")
+  else:
+    return("Can't recognize Method","OK","text")
       
-      
-  return ("name=gaurav&phone=4567854356&email=hello@gmail.com",'Ok')
 
-
-
-  #################################################
 
 
 def return_data_for_client(parsed_data):
@@ -77,8 +99,10 @@ while True:
   print("Waiting for connection ...")
   data ,addr = sock.recvfrom(4096)
   print("Coneected to ",addr)
-  print(data)
-  parsed_data = client_data_parser(data.decode())
-  msg = return_data_for_client(parsed_data)
-  sock.sendto(msg.encode(), addr)
+  try:
+    parsed_data = client_data_parser(data.decode())
+    msg = return_data_for_client(parsed_data)
+    sock.sendto(msg.encode(), addr)
+  except:
+    continue
   

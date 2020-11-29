@@ -27,20 +27,20 @@ def insert(db, data):  # data = [email,name,address,profession,phoennumber]
         db.commit()
         return f"{data[1]} was added sucessfully"
     except Error as e:
-        return "DataBase Error:"
+        return "DataBase Error"
 
 def delete(db, email, flag = True):
     c = db.cursor()
     c.execute("SELECT * FROM info WHERE Email=?", (email,))
     data = c.fetchall()
     if len(data) == 0:
-        print("Can't delete as it doesn't exist")
+        return "No Such Data To Delete"
     else:
         if flag : 
             sql_query = 'DELETE FROM info WHERE Email=?'
             c.execute(sql_query, (email,))
             db.commit()
-            print("entry deleted")
+            return f'{email} deleted sucessfull'
         else:
             print("You cancelled the process")
 

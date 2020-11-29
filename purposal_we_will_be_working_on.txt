@@ -1,0 +1,96 @@
+Status Code : (Sucess / Not - Found)
+Method : 
+			Insert - put some record i.e create some record
+			Pull - get record
+			Update - update some record for the existing user
+
+Headers :
+			Id : will be used to authenticate user if needed;
+			encoding : utf-8;
+			content-type : for acessing form data;
+
+
+Data 	:   
+			Depends opon the content type
+			
+			
+			
+			
+			
+exmaple 
+request example 1:- 
+
+	Requesting for Gaurav Name
+
+		Pull,Sped/1.1
+		id:slkcnkjscjksncjsncjksncjsnsdc
+		encoding:utf-8
+		content-type:json
+		name="Gaurav"&emial="hello@gm.com"
+		
+	
+	if we have data in data base:
+	Response1 : 
+	
+		Sped/1.1 200 OK
+		content-type:json
+		name="Gaurav"&email="hello@gm"&home="some_val"&profeson="Faculty"&contact="75654446780"
+		
+	if no data available:
+	Response2 : 
+	
+		Sped/1.1 300 NotFound
+		content-type:text
+		No name exit for gaurav
+
+
+request example 2:- 
+
+	Requesting for creating new entry
+
+		Insert,Sped/1.1
+		id:slkcnkjscjksncjsncjksncjsnsdc
+		encoding:utf-8
+		content-type:json
+		name="Gaurav"&email="hello@gm"&home="some_val"&profeson="Faculty"&contact="75654446780"
+		
+	
+	if we have added sucessfully
+	Response1 : 
+	
+		Sped/1.1 200 OK
+		content-type:text
+		Gaurav was added sucessfully
+		
+	if problem in adding
+	Response2 : 
+	
+		Sped/1.1 200 OK
+		content-type:text
+		Some missing information so cant complete the request
+		
+		
+request example 3:- 
+
+	Requesting for updating some entry
+
+		Update,Sped/1.1
+		id:slkcnkjscjksncjsncjksncjsnsdc
+		encoding:utf-8
+		content-type:json
+		name="Gaurav"&email="newmail@gm"&home="some_val"&profeson="Faculty"&contact="75654446780"
+		
+	
+	if we have updated sucessfully
+	Response1 : 
+	
+		Sped/1.1 200 OK
+		content-type:text
+		Gaurav was added updated
+		
+	if problem in updating
+	Response2 : 
+	
+		Sped/1.1 200 OK
+		content-type:text
+		Some missing information so cant complete the request
