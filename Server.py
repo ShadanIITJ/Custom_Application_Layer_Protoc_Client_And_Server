@@ -42,6 +42,9 @@ def client_data_parser(data):
     email = dic["email"]
     aa = update(db,email,l)
     return(aa,"OK","text")
+  elif (method.lower() == 'delete'):
+    aa = delete(db, dic["email"])
+    return (aa, "OK", "text")
       
       
   return ("name=gaurav&phone=4567854356&email=hello@gmail.com",'Ok')

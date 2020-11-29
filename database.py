@@ -34,15 +34,15 @@ def delete(db, email, flag = True):
     c.execute("SELECT * FROM info WHERE Email=?", (email,))
     data = c.fetchall()
     if len(data) == 0:
-        print("Can't delete as it doesn't exist")
+        return "Can't delete as it doesn't exist"
     else:
-        if flag : 
+        if flag:
             sql_query = 'DELETE FROM info WHERE Email=?'
             c.execute(sql_query, (email,))
             db.commit()
-            print("entry deleted")
+            return "entry deleted"
         else:
-            print("You cancelled the process")
+            return "You cancelled the process"
 
 def clear_database(db, flag = True):
     if flag:
@@ -88,6 +88,7 @@ def update(db,email,data):   # data = [name,address,profession,phoennumber]
         c.execute(sql_query, data)
         db.commit()
         return f"{data[0]} was added sucessfully"
+
 
 
 
