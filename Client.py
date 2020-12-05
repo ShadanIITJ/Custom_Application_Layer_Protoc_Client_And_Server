@@ -2,7 +2,9 @@
 import socket
 import sys
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-sock.settimeout(5)# wait for 5 second to receive somethong back from server
+sock.settimeout(5)# wait for 5 second to receive somethong back from server 13.89.206.2
+
+setting_advanced = True
 
 def can_convert_to_json(data):
     try:
@@ -20,25 +22,31 @@ def create_message(inp):
     inp = inp.split(" ")
     msg=None
     if(inp[0].lower()=='pull'):
-        if(inp[1][3:].lower()=='json' and can_convert_to_json(inp[2][3:])):
+        if(inp[-2][3:].lower()=='json' and can_convert_to_json(inp[-1][3:])):
             msg="pull,Sped/1.1\r\n"
             msg+="encoding:utf-8\r\ncontent-type:json\r\n"
             data = inp[-1][3:]
             msg+=data
+        elif(inp[-2][3:].lower()=='text'):
+            msg="pull,Sped/1.1\r\n"
+            msg+="id:"+inp[1][4:]+"\r\n"
+            msg+="encoding:utf-8\r\ncontent-type:text\r\n"
+            data = inp[-1][3:]
+            msg+=data
     elif(inp[0].lower()=='insert'):
-        if(inp[1][3:].lower()=='json' and can_convert_to_json(inp[2][3:])):
+        if(inp[-2][3:].lower()=='json' and can_convert_to_json(inp[-1][3:])):
             msg="insert,Sped/1.1\r\n"
             msg+="encoding:utf-8\r\ncontent-type:json\r\n"
             data = inp[-1][3:]
             msg+=data
     elif(inp[0].lower()=='update'):
-        if(inp[1][3:].lower()=='json' and can_convert_to_json(inp[2][3:])):
+        if(inp[-2][3:].lower()=='json' and can_convert_to_json(inp[-1][3:])):
             msg="update,Sped/1.1\r\n"
             msg+="encoding:utf-8\r\ncontent-type:json\r\n"
             data = inp[-1][3:]
             msg+=data
     elif(inp[0].lower()=='delete'):
-        if(inp[1][3:].lower()=='json' and can_convert_to_json(inp[2][3:])):
+        if(inp[-2][3:].lower()=='json' and can_convert_to_json(inp[-1][3:])):
             msg="delete,Sped/1.1\r\n"
             msg+="encoding:utf-8\r\ncontent-type:json\r\n"
             data = inp[-1][3:]
@@ -78,7 +86,7 @@ def decode_message(rec):
 
 def genrate_help(inp):
     if len(inp)==4:
-        msg="\r\nSped Client, Version 1.1\r\nThese shell commands are defined internally. Type `help' to see this list\r\nType `help name' to find out more about the function `name'\r\nEnter Exit to close the Client\r\n"
+        msg="\r\nSped Client, Version 1.1\r\nThese shell commands are defined internally. Type `help' to see this list\r\nType `help name' to find out more about the function `name'\r\nEnter Settings basic\ advanced to switch between settings\r\nEnter Exit to close the Client\r\n"
         print(msg)
         msg ="function [Argument] ....\r\npull [-f] [-d] \t '-f'=format '-d'=data >\r\ninsert [-f] [-d]" \
              "\t '-f'=format '-d'=data\r\nupdate [-f] [-d]" \
@@ -107,6 +115,13 @@ def genrate_help(inp):
             return genrate_help("help")
 
 
+def basic_settings(send_messge,recv_message):
+    print("\nmessage being sent is :--- \n")
+    print(send_messge)
+    print("\nReceived Message is :---\n")
+    print(recv_message)
+    print("\n")
+
 def Activate_Connection():
     # input formate / pull -f='json' -d='key:value';
     
@@ -121,7 +136,23 @@ def Activate_Connection():
     if (inp[0:4].lower()=='help'):
         genrate_help(inp.rstrip())
         Activate_Connection()
-    
+    if(inp[0:8].lower()=="settings"):
+        temp = inp.split(" ")
+        if(len(temp)==1):
+            global setting_advanced
+            if(setting_advanced):
+                print("Advanced Mode")
+            else:
+                print("Basic Mode")
+            Activate_Connection()
+        if(temp[-1].lower()=="basic"):
+            setting_advanced = False
+        elif(temp[-1].lower()=="advanced"):
+            setting_advanced=True
+        else:
+            print("No Such Setting Exist! ")
+        Activate_Connection()
+
     messgae_for_server = create_message(inp)
     if(messgae_for_server==None):
         print("Received input cant be converted into the SPED Protocols| Try our Help command to Know more")
@@ -139,14 +170,17 @@ def Activate_Connection():
         print("Try again! or Exit")
         return Activate_Connection()
     
-    p_message=decode_message(data.decode())
-    #print("messgae received from serve is :-- ")
-    print(p_message)
+    if(setting_advanced):
+        p_message=decode_message(data.decode())
+        #print("messgae received from serve is :-- ")
+        print("\n")
+        print(p_message)
+        print("\n")
+    else:
+        basic_settings(messgae_for_server,data.decode())
     Activate_Connection()
 
 
 if(__name__=="__main__"):
     print("\r\nWelcome TO SPED Client\r\nEnter help to know more\r\n")
     Activate_Connection()
-
-

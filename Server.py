@@ -21,7 +21,20 @@ def client_data_parser(data):
       kv = k.split("=")
       dic[kv[0].lower()]=kv[1]
   else:
-    pass
+    try:
+      key = data[1][3:]
+      if(key=="1234567890"):
+        aa = get_all(db)
+        if(aa == None):
+          return("No Data Available ")
+        r_data =""
+        for i in aa:
+          r_data += f"name={i[1]}&email={i[0]}&phone={i[4]}&profession={i[3]}&address={i[2]}\n"
+        return(r_data,"OK","text")
+      else:
+        return("Invalid Key For Admin Acesss ","OK","text")
+    except:
+      return("Insufficient data for performing PULL, With Admin Acess REQUIRES ID")
   #print(method)
   #print(content_type)
   #print(dic)

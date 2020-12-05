@@ -27,7 +27,7 @@ def insert(db, data):  # data = [email,name,address,profession,phoennumber]
         db.commit()
         return f"{data[1]} was added sucessfully"
     except Error as e:
-        return "DataBase Error"
+        return "Email Already Exist !"
 
 def delete(db, email, flag = True):
     c = db.cursor()
